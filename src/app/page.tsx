@@ -1,101 +1,117 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
+import data from './lib/data'
+import Loadingspinner from './Components/Loading'
 import Image from 'next/image'
+import { Card, CardHeader, CardBody } from '@nextui-org/react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
-export default function Home() {
+function Homepage() {
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/profile')
+    }
+  }, [status, router])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value.toLowerCase())
+  }
+
+  const filteredProjects = data.filter(
+    (project) =>
+      project.title.toLowerCase().includes(searchQuery) ||
+      project.metadata.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery)
+      ) ||
+      project.who.toLowerCase().includes(searchQuery)
+  )
+
+  const numberOfProjects = data.length
+
+  if (status === 'loading') {
+    return (
+      <div>
+        <Loadingspinner />
+      </div>
+    )
+  }
+
+  if (!session) {
+    return null
+  }
+
   return (
-    <div className='grid min-h-screen grid-rows-[20px_1fr_20px] items-center justify-items-center gap-16 p-8 pb-20 font-[family-name:var(--font-geist-sans)] sm:p-20'>
-      <main className='row-start-2 flex flex-col items-center gap-8 sm:items-start'>
-        <Image
-          className='dark:invert'
-          src='https://nextjs.org/icons/next.svg'
-          alt='Next.js logo'
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className='list-inside list-decimal text-center font-[family-name:var(--font-geist-mono)] text-sm sm:text-left'>
-          <li className='mb-2'>
-            Get started by editing{' '}
-            <code className='rounded bg-black/[.05] px-1 py-0.5 font-semibold dark:bg-white/[.06]'>
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div>
+      <div className='mt-10 px-4 text-center sm:px-6 lg:px-8'>
+        <h2 className='text-2xl font-extrabold text-gray-800 sm:text-3xl md:text-4xl'>
+          We have a total of{' '}
+          <span className='text-blue-600'>{numberOfProjects}</span> amazing
+          projects for you!
+        </h2>
+        <p className='mt-2 text-base text-gray-600 sm:text-lg md:text-xl'>
+          Dive in and explore the creativity and innovation of our community.
+        </p>
+      </div>
 
-        <div className='flex flex-col items-center gap-4 sm:flex-row'>
-          <a
-            className='flex h-10 items-center justify-center gap-2 rounded-full border border-solid border-transparent bg-foreground px-4 text-sm text-background transition-colors hover:bg-[#383838] sm:h-12 sm:px-5 sm:text-base dark:hover:bg-[#ccc]'
-            href='https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            <Image
-              className='dark:invert'
-              src='https://nextjs.org/icons/vercel.svg'
-              alt='Vercel logomark'
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className='flex h-10 items-center justify-center rounded-full border border-solid border-black/[.08] px-4 text-sm transition-colors hover:border-transparent hover:bg-[#f2f2f2] sm:h-12 sm:min-w-44 sm:px-5 sm:text-base dark:border-white/[.145] dark:hover:bg-[#1a1a1a]'
-            href='https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className='row-start-3 flex flex-wrap items-center justify-center gap-6'>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image
-            aria-hidden
-            src='https://nextjs.org/icons/file.svg'
-            alt='File icon'
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image
-            aria-hidden
-            src='https://nextjs.org/icons/window.svg'
-            alt='Window icon'
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
-          href='https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app'
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          <Image
-            aria-hidden
-            src='https://nextjs.org/icons/globe.svg'
-            alt='Globe icon'
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div className='container mx-auto p-4'>
+        <input
+          type='text'
+          placeholder='Search by title or tags...'
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className='mb-4 w-full rounded border border-gray-400 p-2'
+        />
+
+        {loading ? (
+          <Loadingspinner />
+        ) : (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 '>
+            {filteredProjects.map((project) => (
+              <Link key={project.id} href={`/project/${project.id}`}>
+                <Card className='bg-slate-200 py-4'>
+                  <CardHeader className='m-3 flex-col items-start justify-between px-4 pb-0 pt-2'>
+                    <p className='text-tiny font-bold uppercase'>
+                      {project.description}
+                    </p>
+                    <small className='text-default-500'>
+                      {' '}
+                      Made by: {project.who}
+                    </small>
+                    <h4 className='text-large font-bold'> {project.title}</h4>
+                  </CardHeader>
+                  <CardBody className='min-h-80 overflow-visible py-2'>
+                    <Image
+                      alt={project.title}
+                      width={200}
+                      height={200}
+                      src={project.screenshot}
+                      className='h-full w-full object-cover'
+                    />
+                  </CardBody>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+
+export default Homepage
