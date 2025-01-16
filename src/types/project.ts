@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-const project = z.object({
+export const projectSchema = z.object({
   title: z.string().nonempty(),
   description: z.string().nonempty(),
-  type: z.string(),
-  tags: z.string().array(),
+  type: z.enum(['research software', 'student project']),
+  tags: z.string().toLowerCase().array(),
   urlGitHub: z.string().url(),
-  urlHomepage: z.string().url(),
-  urlScreenshots: z.string().array(),
+  urlHomepage: z.string().url().optional(),
+  urlScreenshots: z.string().array().optional(),
 })
 
-export type Project = z.infer<typeof project>
+export type Project = z.infer<typeof projectSchema>
