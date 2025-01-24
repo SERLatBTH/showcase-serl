@@ -18,4 +18,12 @@ export const availableProjects = z.array(projectSchema).parse([
     tags: ['credit', 'paper', 'contributor'],
     urlGitHub: 'https://github.com/andreas-bauer/credit-maker',
   },
+  {
+    title: 'CiRA',
+    description:
+      'Causality in Requirements Artifacts (CiRA) is an initiative centered around the notion of causal requirements and causality extraction for automatic test case generation.',
+    type: 'research software',
+    tags: ['requirements', 'NLP', 'causality extraction'],
+    urlGitHub: 'https://github.com/JulianFrattini/cira',
+  },
 ])
